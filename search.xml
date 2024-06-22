@@ -31,48 +31,4 @@
         <tag>信息收集</tag>
       </tags>
   </entry>
-  <entry>
-    <title>目录扫描</title>
-    <url>/2024/062135358.html</url>
-    <content><![CDATA[<h1 id="目录扫描"><a href="#目录扫描" class="headerlink" title="目录扫描"></a>目录扫描</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>网站目录本质上就是文件夹，不同的文件夹放着不同的文件。<br>进行目录扫描是为了翻不同的文件夹，来找到可以利用的文件。</p>
-<p>目录扫描主要有如下两种方式</p>
-<p>1.爆破<br>目录扫描最常见的就是通过一个字典进行爆破，字典的精准度决定了你扫描的完整度。有时也可以用集成工具，比较方便。<br>爆破的好处是能让我们发现一些隐藏页面，比如网站测试页面，隐藏的后台页面等等。<br>2.爬虫<br>爬虫是通过一个网页源代码找存在的路径，然后递归爬取下一个页面，爬虫好处是能爬取全部我们能访问的页面，但缺点就是没有链接到页面的隐藏页面没法获取。</p>
-<h2 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h2><h3 id="Http方法"><a href="#Http方法" class="headerlink" title="Http方法"></a>Http方法</h3><h4 id="Get方法"><a href="#Get方法" class="headerlink" title="Get方法"></a>Get方法</h4><p>用于请求服务器发送某个资源。GET 请求不应该对服务器上的资源做出任何更改，并且应该是幂等的（即多次重复的请求应该产生相同的结果）。例如，当你在浏览器中输入 URL 地址时，浏览器会发送一个 GET 请求来获取该 URL 对应的网页。</p>
-<p>除此之外 GET 请求还可以包含查询字符串，使用 <code>&amp;</code> 来拼接多个参数：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">GET /path?name=value&amp;another=value HTTP/1.1</span><br><span class="line">Host: class.glock09.com</span><br></pre></td></tr></table></figure>
-
-<p>服务器对GET请求的响应包括状态码、响应头和响应：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Content-Type: text/html; charset=UTF-8</span><br><span class="line"></span><br><span class="line">&lt;html&gt;</span><br><span class="line">  &lt;body&gt;</span><br><span class="line">    &lt;p&gt;Hello, world!&lt;/p&gt;</span><br><span class="line">  &lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
-
-<h4 id="OPTIONS方法"><a href="#OPTIONS方法" class="headerlink" title="OPTIONS方法"></a>OPTIONS方法</h4><p>用于请求服务器返回支持的 HTTP 方法和其他选项。例如，客户端可以发送 OPTIONS 请求来确定服务器支持哪些 CORS（跨域资源共享）策略。用于查询服务器支持哪些 HTTP 方法。</p>
-<p>基本语法</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">OPTIONS /index.html HTTP/1.1</span><br><span class="line">OPTIONS * HTTP/1.1</span><br><span class="line">或</span><br><span class="line">OPTIONS /path HTTP/1.1</span><br><span class="line">Host: class.glock09.com</span><br></pre></td></tr></table></figure>
-
-<p>响应报文包含一个 <code>Allow</code>首部字段，该字段的值表明了服务器支持的<strong>所有 HTTP 方法</strong>。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Allow: OPTIONS, GET, HEAD, POST #</span><br></pre></td></tr></table></figure>
-
-<h4 id="HEAD方法"><a href="#HEAD方法" class="headerlink" title="HEAD方法"></a>HEAD方法</h4><p>类似于 GET 请求，但服务器不返回请求的资源主体，只返回响应头。HEAD 请求通常用于获取资源的元信息，如资源的大小、类型等，而不需要获取资源的实际内容。这有助于减少不必要的数据传输。所以 HEAD 请求的效率要比较 GET 高很多。</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">HEAD /index.html</span><br><span class="line">或</span><br><span class="line">HEAD /path HTTP/1.1</span><br><span class="line">Host: class.glock09.com</span><br></pre></td></tr></table></figure>
-
-<p>相应信息</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Content-Type: text/html; charset=UTF-8</span><br><span class="line">Content-Length: 12345</span><br><span class="line">Last-Modified: Wed, 21 Oct 2024 14:45:26 GMT</span><br></pre></td></tr></table></figure>
-
-<h3 id="爬虫技术"><a href="#爬虫技术" class="headerlink" title="爬虫技术"></a>爬虫技术</h3><p>使用 Web 爬虫技术，可以自动化地遍历网站并收集目录信息。一些老的网站使用这种爬虫方法收集目录可能有奇效，但是目前这种方法正在被淘汰。</p>
-<h3 id="目录浏览"><a href="#目录浏览" class="headerlink" title="目录浏览"></a>目录浏览</h3><p>目录浏览漏洞是由于网站存在配置缺陷，导致网站目录可以被任意浏览，这会导致网站很多隐私文件与目录泄露，比如<a href="https://cloud.tencent.com/product/dbs?from_column=20065&from=20065">数据库备份</a>文件、配置文件等，攻击者利用该信息可以为进一步入侵网站做准备。访问网站时出现 <code>Index of /</code> 或类似的目录列表，这通常被称为 “目录列表” 或 “目录浏览” 漏洞。</p>
-<img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202406221554617.jpeg" alt="img" style="zoom:67%;" />
-
-
-
-<p>Fofa 特征：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&quot;Index of /&quot; &amp;&amp; country=&quot;CN&quot;</span><br></pre></td></tr></table></figure>
-
-<h3 id="目录枚举"><a href="#目录枚举" class="headerlink" title="目录枚举"></a>目录枚举</h3><p>目录枚举是一种 Fuzz 技术，主要核心是利用网站路径目录字典批量去请求网站服务器，根据服务器的响应来判断目录是否存在 。核心还是字典。</p>
-]]></content>
-      <categories>
-        <category>WEB</category>
-      </categories>
-      <tags>
-        <tag>主动信息收集</tag>
-      </tags>
-  </entry>
 </search>
