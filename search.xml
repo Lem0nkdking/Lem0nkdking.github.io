@@ -45,7 +45,10 @@
   <entry>
     <title>端口扫描</title>
     <url>/2024/062233124.html</url>
-    <content><![CDATA[<h1 id="主动信息搜集"><a href="#主动信息搜集" class="headerlink" title="主动信息搜集"></a>主动信息搜集</h1><h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><p>渗透测试中的端口扫描是指通过网络探测技术，识别目标系统上开放的网络端口及其对应的服务。 但是随着互联网的成熟，大多数网站很少对外直接暴露过多的端口了：</p>
+    <content><![CDATA[<h1 id="主动信息搜集"><a href="#主动信息搜集" class="headerlink" title="主动信息搜集"></a>主动信息搜集</h1><p><strong>本篇文章来自于GG师傅的课程（全国第一WEB课程），仅用作自己学习记录。以后会慢慢输出自己的文章，感兴趣的可以去找GG师傅咨询课程。</strong></p>
+<p>参考链接：<a href="https://www.sqlsec.com/2017/07/nmap.html">https://www.sqlsec.com/2017/07/nmap.html</a></p>
+<p>GG师傅博客：<a href="https://www.sqlsec.com/">https://www.sqlsec.com/</a></p>
+<h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><p>渗透测试中的端口扫描是指通过网络探测技术，识别目标系统上开放的网络端口及其对应的服务。 但是随着互联网的成熟，大多数网站很少对外直接暴露过多的端口了：</p>
 <p>所以渗透测试中，使用主动地端口扫描技术来收集的方式已经不是主流，端口扫描在内网当中使用场景更加广泛。</p>
 <span id="more"></span>
 
