@@ -8,6 +8,8 @@
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">view-source:https://25b672e8-95f7-4258-8246-e2fae04f135f.challenge.ctf.show/</span><br></pre></td></tr></table></figure>
 
 <h2 id="Web3"><a href="#Web3" class="headerlink" title="Web3"></a>Web3</h2><p>直接抓包</p>
+<span id="more"></span>
+
 <p>或者f12在网络里找</p>
 <img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202507210915357.png" alt="image-20250721091511285" style="zoom:67%;" />
 
@@ -327,6 +329,8 @@
     <title>认证爆破</title>
     <url>/2024/082326737.html</url>
     <content><![CDATA[<h1 id="认证爆破"><a href="#认证爆破" class="headerlink" title="认证爆破"></a>认证爆破</h1><h2 id="认证技术"><a href="#认证技术" class="headerlink" title="认证技术"></a>认证技术</h2><p>身份认证技术是用于在计算机网络中确认操作者身份的一种有效的解决方法。计算机网络世界中一切信息包括用户的身份信息都是用一组特定的数据来表示的，计算机只能识别用户的数字身份，所有对用户的授权也是针对用户数字身份的授权。<br>身份认证攻击就是为了使用各种办法通过这层认证，突破作为防护网络资产的第一道关口，身份认证攻击在渗透测试中有着举足轻重的作用。<br>对于身份认证攻击可以直接进行爆破攻击，在配置不当的情况下内网中还会经常遇到非授权访问。</p>
+<span id="more"></span>
+
 <h2 id="Web认证爆破"><a href="#Web认证爆破" class="headerlink" title="Web认证爆破"></a>Web认证爆破</h2><h3 id="1-四位数字爆破"><a href="#1-四位数字爆破" class="headerlink" title="[1-四位数字爆破]"></a><strong>[1-四位数字爆破]</strong></h3><p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408241532460.png" alt="image-20240824153241405"></p>
 <p>抓包，添加定位符</p>
 <p><img src="https://gitee.com/kd-stroke-king/lem0n-picgo/raw/master/master/202408241538909.png" alt="image-20240824153812869"></p>
